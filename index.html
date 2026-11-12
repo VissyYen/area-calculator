@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f6b3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Acres">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Area Converter</title>
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--text:#1f2a1f;--muted:#68735f;--accent:#2f6b3a;--accent-t:#fff;--line:#dcd8cc;--chip:#eaf1e6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a15;--card:#1e251e;--text:#e8efe5;--muted:#9aa793;--accent:#6fbf7d;--accent-t:#10200f;--line:#324032;--chip:#273327;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a15;--card:#1e251e;--text:#e8efe5;--muted:#9aa793;--accent:#6fbf7d;--accent-t:#10200f;--line:#324032;--chip:#273327;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center;padding:24px 16px}
+main{width:100%;max-width:460px}
+h1{font-size:1.5rem;margin:8px 0 4px}
+p.sub{margin:0 0 16px;color:var(--muted);font-family:system-ui,sans-serif;font-size:.9rem}
+.tabs{display:flex;gap:6px;margin-bottom:12px;font-family:system-ui,sans-serif}
+.tabs button{flex:1;padding:10px 8px;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;font-size:.9rem;cursor:pointer;font-family:inherit}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;font-family:system-ui,sans-serif}
+.panel[hidden]{display:none}
+label{display:block;font-size:.8rem;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em}
+.row{display:flex;gap:8px;align-items:stretch}
+input,select{font-family:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px}
+input{flex:1;min-width:0;font-size:1.6rem;padding:10px 12px}
+select{font-size:1rem;padding:0 8px;max-width:48%;min-width:96px}
+input:focus,select:focus{outline:2px solid var(--accent);border-color:transparent}
+.unit{display:flex;align-items:center;padding:0 12px;border-radius:10px;background:var(--chip);font-weight:600;min-width:64px;justify-content:center}
+button.swap{margin:14px auto;display:block;background:var(--accent);color:var(--accent-t);border:0;border-radius:999px;padding:8px 18px;font-size:.9rem;cursor:pointer;font-family:inherit}
+.result input{font-weight:700}
+.formula{margin-top:16px;font-size:.85rem;color:var(--muted)}
+.more{margin-top:18px;border-top:1px solid var(--line);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.more div{background:var(--chip);border-radius:10px;padding:10px}
+.more small{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em}
+.more b{font-size:.95rem;word-break:break-all}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.quick button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Area Converter</h1>
+<p class="sub">Acres, square feet, square metres and more. Works offline.</p>
+
+<div class="tabs" role="tablist">
+  <button type="button" role="tab" id="t1" aria-selected="true">Acres ⇄ sq ft</button>
+  <button type="button" role="tab" id="t2" aria-selected="false">All units</button>
+</div>
+
+<div class="card">
+<!-- Panel 1: acres / sq ft -->
+<section class="panel" id="p1">
+  <label id="l1" for="a">Acres</label>
+  <div class="row"><input id="a" type="number" inputmode="decimal" min="0" step="any" value="1" aria-label="Input value"><div class="unit" id="u1">ac</div></div>
+  <button class="swap" id="swap" type="button">⇅ Swap direction</button>
+  <label id="l2" for="b">Square feet</label>
+  <div class="row result"><input id="b" type="text" readonly aria-label="Result"><div class="unit" id="u2">sq ft</div></div>
+  <div class="quick" id="quick"></div>
+  <div class="formula" id="f"></div>
+</section>
+
+<!-- Panel 2: general converter -->
+<section class="panel" id="p2" hidden>
+  <label for="gv">From</label>
+  <div class="row"><input id="gv" type="number" inputmode="decimal" min="0" step="any" value="1" aria-label="Value to convert"><select id="gf" aria-label="From unit"></select></div>
+  <button class="swap" id="gswap" type="button">⇅ Swap units</button>
+  <label for="gr">To</label>
+  <div class="row result"><input id="gr" type="text" readonly aria-label="Result"><select id="gt" aria-label="To unit"></select></div>
+  <div class="formula" id="gf2"></div>
+  <div class="more" id="grid"></div>
+</section>
+</div>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i);};
+  function fmt(n,d){ if(!isFinite(n)) return '–'; if(n!==0&&Math.abs(n)<1e-6) return n.toExponential(3); return n.toLocaleString('en-US',{maximumFractionDigits:d==null?4:d}); }
+
+  /* ---------- Tabs ---------- */
+  function showTab(n){
+    $('p1').hidden=n!==1; $('p2').hidden=n!==2;
+    $('t1').setAttribute('aria-selected',n===1); $('t2').setAttribute('aria-selected',n===2);
+    try{location.hash=n===1?'':'units';}catch(e){}
+  }
+  $('t1').onclick=function(){showTab(1);};
+  $('t2').onclick=function(){showTab(2);};
+
+  /* ---------- Panel 1: acres <-> sq ft ---------- */
+  var F=43560, fwd=true, a=$('a'), b=$('b');
+  function update(){
+    var v=parseFloat(a.value);
+    if(isNaN(v)){ b.value=''; $('f').textContent=''; return; }
+    var out=fwd? v*F : v/F;
+    b.value=fmt(out,4);
+    $('f').textContent= fwd ? fmt(v)+' ac × 43,560 = '+fmt(out)+' sq ft' : fmt(v)+' sq ft ÷ 43,560 = '+fmt(out)+' ac';
+  }
+  function setDir(){
+    $('l1').textContent=fwd?'Acres':'Square feet';
+    $('l2').textContent=fwd?'Square feet':'Acres';
+    $('u1').textContent=fwd?'ac':'sq ft';
+    $('u2').textContent=fwd?'sq ft':'ac';
+    var q=$('quick'); q.innerHTML='';
+    (fwd?[0.25,0.5,1,2.5,5,10]:[1000,5000,10890,21780,43560,87120]).forEach(function(x){
+      var bt=document.createElement('button'); bt.type='button'; bt.textContent=x.toLocaleString('en-US');
+      bt.onclick=function(){a.value=x;update();}; q.appendChild(bt);
+    });
+    update();
+  }
+  $('swap').onclick=function(){
+    var r=b.value.replace(/,/g,'');
+    fwd=!fwd; if(r!==''&&!isNaN(parseFloat(r))) a.value=parseFloat(r); setDir();
+  };
+  a.addEventListener('input',update);
+  setDir();
+
+  /* ---------- Panel 2: general area converter ---------- */
+  var U=[ /* key, label, short, square metres per unit */
+    ['sqft','Square feet','sq ft',0.09290304],
+    ['m2','Square metres','m²',1],
+    ['acre','Acres','ac',4046.8564224],
+    ['ha','Hectares','ha',10000],
+    ['sqyd','Square yards','sq yd',0.83612736],
+    ['sqin','Square inches','sq in',0.00064516],
+    ['cm2','Square centimetres','cm²',0.0001],
+    ['km2','Square kilometres','km²',1000000],
+    ['sqmi','Square miles','sq mi',2589988.110336]
+  ];
+  var gv=$('gv'), gf=$('gf'), gt=$('gt');
+  U.forEach(function(u,i){
+    gf.add(new Option(u[1],i)); gt.add(new Option(u[1],i));
+  });
+  gf.value=0; gt.value=1;
+  function gupdate(){
+    var v=parseFloat(gv.value), f=U[gf.value], t=U[gt.value];
+    var grid=$('grid'); grid.innerHTML='';
+    if(isNaN(v)){ $('gr').value=''; $('gf2').textContent=''; return; }
+    var sqm=v*f[3];
+    var out=sqm/t[3];
+    $('gr').value=fmt(out,6);
+    $('gf2').textContent=fmt(v)+' '+f[2]+' = '+fmt(out,6)+' '+t[2];
+    U.forEach(function(u){
+      if(u===f) return;
+      var d=document.createElement('div');
+      d.innerHTML='<small></small><b></b>';
+      d.firstChild.textContent=u[1];
+      d.lastChild.textContent=fmt(sqm/u[3],6)+' '+u[2];
+      grid.appendChild(d);
+    });
+  }
+  $('gswap').onclick=function(){
+    var r=$('gr').value.replace(/,/g,'');
+    var x=gf.value; gf.value=gt.value; gt.value=x;
+    if(r!==''&&!isNaN(parseFloat(r))) gv.value=parseFloat(r);
+    gupdate();
+  };
+  gv.addEventListener('input',gupdate); gf.addEventListener('change',gupdate); gt.addEventListener('change',gupdate);
+  gupdate();
+
+  if(location.hash==='#units') showTab(2);
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+</body>
+</html>
