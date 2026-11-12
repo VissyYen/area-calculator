@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2f6b3a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Area">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<title>Area Toolkit</title>
+<style>
+:root{--bg:#f5f3ee;--card:#fff;--text:#1f2a1f;--muted:#68735f;--accent:#2f6b3a;--accent-t:#fff;--line:#dcd8cc;--chip:#eaf1e6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#151a15;--card:#1e251e;--text:#e8efe5;--muted:#9aa793;--accent:#6fbf7d;--accent-t:#10200f;--line:#324032;--chip:#273327;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#151a15;--card:#1e251e;--text:#e8efe5;--muted:#9aa793;--accent:#6fbf7d;--accent-t:#10200f;--line:#324032;--chip:#273327;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-family:Georgia,"Times New Roman",serif;display:flex;justify-content:center;padding:24px 16px}
+main{width:100%;max-width:480px}
+h1{font-size:1.5rem;margin:8px 0 4px}
+p.sub{margin:0 0 16px;color:var(--muted);font-family:system-ui,sans-serif;font-size:.9rem}
+.tabs{display:flex;gap:6px;margin-bottom:12px;font-family:system-ui,sans-serif}
+.tabs button,.seg button{padding:10px 6px;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:10px;font-size:.85rem;cursor:pointer;font-family:inherit;flex:1}
+.tabs button[aria-selected="true"],.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+.seg{display:flex;gap:6px;margin-bottom:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;font-family:system-ui,sans-serif}
+.panel[hidden]{display:none}
+h2{font-size:1.05rem;margin:0 0 4px;font-family:Georgia,serif}
+.hint{margin:0 0 16px;color:var(--muted);font-size:.85rem}
+label{display:block;font-size:.75rem;color:var(--muted);margin:0 0 6px;text-transform:uppercase;letter-spacing:.05em}
+.row{display:flex;gap:8px;align-items:stretch;margin-bottom:14px}
+input,select{font-family:inherit;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:10px}
+input{flex:1;min-width:0;font-size:1.5rem;padding:10px 12px}
+select{font-size:.95rem;padding:0 8px;width:44%;min-width:110px}
+.row.two{flex-wrap:wrap}.row.two select{width:100%;order:3;padding:10px 8px}
+.fi{position:relative;flex:1;min-width:0;display:flex}.fi input{width:100%;padding-right:44px}
+.fi i{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-style:normal;font-size:.9rem;pointer-events:none}
+.fi[hidden]{display:none}
+input:focus,select:focus{outline:2px solid var(--accent);border-color:transparent}
+.out{background:var(--chip);border-radius:12px;padding:14px;margin-top:4px}
+.out small{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em}
+.out b{font-size:1.7rem;word-break:break-all}
+.out span{font-size:1rem;margin-left:6px;color:var(--muted)}
+button.swap{margin:0 auto 14px;display:block;background:var(--accent);color:var(--accent-t);border:0;border-radius:999px;padding:8px 18px;font-size:.9rem;cursor:pointer;font-family:inherit}
+.formula{margin-top:12px;font-size:.85rem;color:var(--muted)}
+.more{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.more div{background:var(--chip);border-radius:10px;padding:10px}
+.more small{display:block;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.05em}
+.more b{font-size:.92rem;word-break:break-all}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.quick button{border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Area Toolkit</h1>
+<p class="sub">Calculate, convert and turn any area into acres. Works offline.</p>
+
+<div class="tabs" role="tablist">
+  <button type="button" role="tab" id="t1" aria-selected="true">Calculator</button>
+  <button type="button" role="tab" id="t2" aria-selected="false">Converter</button>
+  <button type="button" role="tab" id="t3" aria-selected="false">To Acres</button>
+</div>
+
+<div class="card">
+
+<section class="panel" id="p1">
+  <h2>Area calculator</h2>
+  <p class="hint">Enter length and breadth in feet &amp; inches, or pick another unit. Each can differ.</p>
+  <label for="cl">Length</label>
+  <div class="row two" id="clrow"><span class="fi"><input id="cl" type="number" inputmode="decimal" min="0" step="any" value="50" aria-label="Length"><i id="cli">ft</i></span><span class="fi" id="cl2w"><input id="cl2" type="number" inputmode="decimal" min="0" step="any" value="0" aria-label="Length inches"><i>in</i></span><select id="clu" aria-label="Length unit"></select></div>
+  <label for="cb">Breadth</label>
+  <div class="row two" id="cbrow"><span class="fi"><input id="cb" type="number" inputmode="decimal" min="0" step="any" value="30" aria-label="Breadth"><i id="cbi">ft</i></span><span class="fi" id="cb2w"><input id="cb2" type="number" inputmode="decimal" min="0" step="any" value="0" aria-label="Breadth inches"><i>in</i></span><select id="cbu" aria-label="Breadth unit"></select></div>
+  <label for="cou">Show area in</label>
+  <div class="row"><select id="cou" style="width:100%;padding:10px 8px" aria-label="Area unit"></select></div>
+  <div class="out"><small>Area</small><b id="cr">–</b><span id="cru"></span></div>
+  <div class="formula" id="cf"></div>
+  <div class="more" id="cg"></div>
+</section>
+
+<section class="panel" id="p2" hidden>
+  <h2>Area converter</h2>
+  <p class="hint">Type an area and pick the units.</p>
+  <label for="gv">From</label>
+  <div class="row"><input id="gv" type="number" inputmode="decimal" min="0" step="any" value="1"><select id="gf" aria-label="From unit"></select></div>
+  <button class="swap" id="gswap" type="button">⇅ Swap units</button>
+  <label for="gt">To</label>
+  <div class="row" style="margin-bottom:0"><select id="gt" style="width:100%;padding:10px 8px" aria-label="To unit"></select></div>
+  <div class="out" style="margin-top:12px"><small>Result</small><b id="gr">–</b><span id="gru"></span></div>
+  <div class="formula" id="gff"></div>
+  <div class="more" id="gg"></div>
+</section>
+
+<section class="panel" id="p3" hidden>
+  <h2>Convert to acres</h2>
+  <p class="hint">Enter an area in square feet or square metres.</p>
+  <div class="seg" id="seg">
+    <button type="button" data-u="sqft" aria-pressed="true">Square feet</button>
+    <button type="button" data-u="m2" aria-pressed="false">Square metres</button>
+  </div>
+  <label for="av" id="al">Area in square feet</label>
+  <div class="row"><input id="av" type="number" inputmode="decimal" min="0" step="any" value="43560"></div>
+  <div class="quick" id="aq"></div>
+  <div class="out"><small>Acres</small><b id="ar">–</b><span>ac</span></div>
+  <div class="formula" id="af"></div>
+</section>
+
+</div>
+</main>
+
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i);};
+  function fmt(n,d){ if(!isFinite(n)) return '–'; if(n!==0&&Math.abs(n)<1e-6) return n.toExponential(3); return n.toLocaleString('en-US',{maximumFractionDigits:d==null?4:d}); }
+  function num(el){ var v=parseFloat(el.value); return isNaN(v)?null:v; }
+
+  /* Area units: key, label, short, square metres per unit */
+  var A=[
+    ['sqft','Square feet','sq ft',0.09290304],
+    ['m2','Square metres','m²',1],
+    ['acre','Acres','ac',4046.8564224],
+    ['ha','Hectares','ha',10000],
+    ['sqyd','Square yards','sq yd',0.83612736],
+    ['sqin','Square inches','sq in',0.00064516],
+    ['cm2','Square centimetres','cm²',0.0001],
+    ['km2','Square kilometres','km²',1000000],
+    ['sqmi','Square miles','sq mi',2589988.110336]
+  ];
+  /* Length units: label, short, metres per unit */
+  var L=[
+    ['Feet','ft',0.3048],['Inches','in',0.0254],['Yards','yd',0.9144],
+    ['Metres','m',1],['Centimetres','cm',0.01],['Kilometres','km',1000],['Miles','mi',1609.344]
+  ];
+  function fill(sel,arr,sel0){ arr.forEach(function(u,i){sel.add(new Option(u[0]===undefined?u[1]:u[0],i));}); sel.value=sel0; }
+  function fillA(sel,sel0){ A.forEach(function(u,i){sel.add(new Option(u[1]+' ('+u[2]+')',i));}); sel.value=sel0; }
+  function grid(el,sqm,skip){
+    el.innerHTML='';
+    A.forEach(function(u,i){
+      if(i==skip) return;
+      var d=document.createElement('div'); d.innerHTML='<small></small><b></b>';
+      d.firstChild.textContent=u[1]; d.lastChild.textContent=fmt(sqm/u[3],6)+' '+u[2];
+      el.appendChild(d);
+    });
+  }
+
+  /* Tabs */
+  var names=['calc','convert','acres'];
+  function showTab(n){
+    for(var i=1;i<=3;i++){ $('p'+i).hidden=i!==n; $('t'+i).setAttribute('aria-selected',i===n); }
+    try{location.hash=names[n-1];}catch(e){}
+  }
+  [1,2,3].forEach(function(n){ $('t'+n).onclick=function(){showTab(n);}; });
+
+  /* 1. Calculator */
+  var LC=[['Feet & inches','ft + in',0.3048]].concat(L); /* index 0 = feet + inches */
+  function fillL(sel){ LC.forEach(function(u,i){sel.add(new Option(u[0],i));}); sel.value=0; }
+  fillL($('clu')); fillL($('cbu')); fillA($('cou'),0);
+  function lenSetup(pre){
+    var idx=+$('c'+pre+'u').value, two=idx===0;
+    $('c'+pre+'2w').hidden=!two;
+    $('c'+pre+'row').className=two?'row two':'row';
+    $('c'+pre+'i').textContent=two?'ft':LC[idx][1];
+  }
+  function lenM(pre){ /* returns [metres, label] or null */
+    var idx=+$('c'+pre+'u').value, v=num($('c'+pre));
+    if(idx===0){
+      var v2=num($('c'+pre+'2'));
+      if(v===null&&v2===null) return null;
+      var ft=v||0, inch=v2||0;
+      return [(ft*12+inch)*0.0254, fmt(ft)+' ft'+(inch?' '+fmt(inch)+' in':'')];
+    }
+    if(v===null) return null;
+    return [v*LC[idx][2], fmt(v)+' '+LC[idx][1]];
+  }
+  function calc(){
+    lenSetup('l'); lenSetup('b');
+    var l=lenM('l'), b=lenM('b'), ou=A[$('cou').value];
+    if(!l||!b){ $('cr').textContent='–'; $('cru').textContent=''; $('cf').textContent=''; $('cg').innerHTML=''; return; }
+    var sqm=l[0]*b[0], out=sqm/ou[3];
+    $('cr').textContent=fmt(out,6); $('cru').textContent=ou[2];
+    $('cf').textContent=l[1]+' × '+b[1]+' = '+fmt(out,6)+' '+ou[2];
+    grid($('cg'),sqm,$('cou').value);
+  }
+  ['cl','cl2','cb','cb2'].forEach(function(i){$(i).addEventListener('input',calc);});
+  ['clu','cbu','cou'].forEach(function(i){$(i).addEventListener('change',calc);});
+  calc();
+
+  /* 2. Converter */
+  fillA($('gf'),0); fillA($('gt'),1);
+  function conv(){
+    var v=num($('gv')), f=A[$('gf').value], t=A[$('gt').value];
+    if(v===null){ $('gr').textContent='–'; $('gru').textContent=''; $('gff').textContent=''; $('gg').innerHTML=''; return; }
+    var sqm=v*f[3], out=sqm/t[3];
+    $('gr').textContent=fmt(out,6); $('gru').textContent=t[2];
+    $('gff').textContent=fmt(v)+' '+f[2]+' = '+fmt(out,6)+' '+t[2];
+    grid($('gg'),sqm,$('gf').value);
+  }
+  $('gswap').onclick=function(){
+    var out=$('gr').textContent.replace(/,/g,''), x=$('gf').value;
+    $('gf').value=$('gt').value; $('gt').value=x;
+    if(out!=='–'&&!isNaN(parseFloat(out))) $('gv').value=parseFloat(out);
+    conv();
+  };
+  $('gv').addEventListener('input',conv); $('gf').addEventListener('change',conv); $('gt').addEventListener('change',conv);
+  conv();
+
+  /* 3. To acres */
+  var au='sqft';
+  var AQ={sqft:[1000,5000,10890,21780,43560,87120], m2:[100,500,1000,4047,10000,50000]};
+  function acres(){
+    var v=num($('av')), f=au==='sqft'?A[0]:A[1], ac=A[2];
+    if(v===null){ $('ar').textContent='–'; $('af').textContent=''; return; }
+    var out=v*f[3]/ac[3];
+    $('ar').textContent=fmt(out,6);
+    $('af').textContent=fmt(v)+' '+f[2]+' ÷ '+fmt(ac[3]/f[3],4)+' = '+fmt(out,6)+' ac';
+  }
+  function quick(){
+    var q=$('aq'); q.innerHTML='';
+    AQ[au].forEach(function(x){ var b=document.createElement('button'); b.type='button'; b.textContent=x.toLocaleString('en-US'); b.onclick=function(){$('av').value=x;acres();}; q.appendChild(b); });
+  }
+  Array.prototype.forEach.call($('seg').children,function(b){
+    b.onclick=function(){
+      au=b.getAttribute('data-u');
+      Array.prototype.forEach.call($('seg').children,function(x){x.setAttribute('aria-pressed',x===b);});
+      $('al').textContent=au==='sqft'?'Area in square feet':'Area in square metres';
+      $('av').value=au==='sqft'?43560:4047; quick(); acres();
+    };
+  });
+  $('av').addEventListener('input',acres);
+  quick(); acres();
+
+  var h=location.hash.replace('#',''), i=names.indexOf(h);
+  if(i>0) showTab(i+1);
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js').catch(function(){});});}
+</script>
+</body>
+</html>
